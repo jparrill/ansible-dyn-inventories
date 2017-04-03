@@ -53,12 +53,13 @@ cvs3tns02
 
 ```
 [ovirt]
-host = 'https://ovirt36'
-port = 443
-user = 'admin@internal'
-passw = 'unix1234'
-ssl_insecure = True
-logfile = 'DynInvOvirt.log'
+host = 'https://ovirt36'            ## Connection URL
+port = 443                          ## Connection port
+user = 'admin@internal'             ## Auth
+passw = 'unix1234'                  ## Auth
+ssl_insecure = True                 ## SSL Queries against ovirt
+logfile = 'DynInvOvirt.log'         ## Logfile name
+grp_upper = False                   ## Group name on upppercase also on children ones
 
 [ovirt-classifier]
 basename = 'cvs3t'
@@ -88,4 +89,78 @@ testnode_rabbit02
 testnode_rabbit03
 testnode_rabbit11
 testnode_rabbit_dev_01
+```
+
+### Support for Children groups
+What means that, yeah, we can group other groups to create hierarchy, just use the following syntax
+
+- Input:
+```
+[ovirt-classifier]
+basename = 'cvs3t'
+group_ansible = 'an'
+group_satellite= 'sc'
+group_database = 'md'
+group_rabbitmq = 'mq'
+group_mail = 'ma'
+children_test = 'ansible', 'vars', 'ntp'
+children_test2 = 'lol', 'onnud', 'otp'
+children_test4 = 'dunno', 'testp'
+children_test7 = 'ansible', 'lol' , '3D'
+children_test4 = 'ansible2'
+```
+
+- Output:
+```
+[test:children]
+ansible
+vars
+ntp
+[test7:children]
+ansible
+lol
+3D
+[rabbitmq]
+cvs3tmq01
+cvs3tmq03
+[test2:children]
+lol
+onnud
+otp
+[None]
+copmute_node_01
+copmute_node_02
+cvs3tci02
+cvs3tha03
+cvs3the02
+cvs3the03
+cvs3tkf02
+cvs3tns02
+cvs3tra01
+cvs3tsk01
+cvs3tti02
+test_01
+test_02
+[test4:children]
+ansible2
+```
+
+_NOTE: if you repeat the group, the inventory will take the last as valid one (EG)_
+
+- Input:
+```
+[ovirt-classifier]
+children_test2 = 'ansible', 'vars', 'ntp'
+children_test2 = 'lol', 'onnud', 'tp'
+children_test2 = 'dunno', 'testp'
+children_test2 = 'ansible', 'lol' , '3D'
+children_test2 = 'ansible2'
+```
+
+- Output:
+```
+...
+[test2:children]
+ansible2
+...
 ```
