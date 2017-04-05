@@ -4,15 +4,19 @@
 from ovirtsdk.api import API
 
 # Logging
-import os
 from os.path import realpath
 
 from os.path import dirname
-import logging
 
 # other
+import argparse
 import ConfigParser
 import re
+import json
+
+
+def empty():
+    return {'_meta': {'hostvars': {}}}
 
 
 class Ovirt36Inventory(object):
@@ -20,10 +24,27 @@ class Ovirt36Inventory(object):
     def __init__(self):
         super(Ovirt36Inventory, self).__init__()
         self.get_config()
-        self.logger(self.logpath)
+        self.read_cli_args()
         self.read_cfg_groups()
-        self.ovirt_get_vms(self.url, self.user, self.passw, self.ssl_insecure)
-        self.create_inventory()
+
+        # Called with `--list`.
+        if self.args.list:
+            self.inventory = self.create_inventory()
+        # Called with `--host [hostname]`.
+        elif self.args.host:
+            # Not implemented, since we return _meta info `--list`.
+            self.inventory = empty()
+        # If no groups or vars are present, return an empty inventory.
+        else:
+            self.inventory = empty()
+        print json.dumps(self.inventory)
+
+    # Read the command line args passed to the script.
+    def read_cli_args(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--list', action='store_true')
+        parser.add_argument('--host', action='store')
+        self.args = parser.parse_args()
 
     def get_config(self):
         # Configuration catcher
@@ -46,27 +67,6 @@ class Ovirt36Inventory(object):
 
         # Inventory purposes
         self.vnodes = []
-
-    def logger(self, logfile):
-        '''
-        Function to log all actions
-        '''
-        log_file = logfile
-        logging.getLogger('').handlers = []
-        if not os.path.exists(log_file):
-            open(log_file, 'a').close()
-            logging.basicConfig(
-                filename=log_file,
-                format='%(asctime)-15s %(name)-5s %(levelname)-8s %(message)s',
-                level=logging.INFO
-            )
-        else:
-            logging.basicConfig(
-                filename=log_file,
-                format='%(asctime)-15s %(name)-5s %(levelname)-8s %(message)s',
-                level=logging.INFO
-            )
-        logging.info('RHEV/oVirt Dynamic inv started...')
 
     def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")
@@ -102,7 +102,6 @@ class Ovirt36Inventory(object):
         using sdk to attack ovirt api and getting all the vms to be classfied
         '''
         api = API(url=url, username=user, password=passw, insecure=ssl_insecure)
-        logging.info('nodes found:')
         for vm in api.vms.list():
             vnode = {}
             name = vm.get_name()
@@ -115,7 +114,6 @@ class Ovirt36Inventory(object):
             else:
                 ip = ['']
 
-            logging.info(vnode)
             vnode[group]['nodes'] = '{}-{}'.format(name, ip[0])
 
             self.vnodes.append(vnode)
@@ -156,9 +154,9 @@ class Ovirt36Inventory(object):
                 self.vnodes.append(children_groups)
 
     def create_inventory(self):
+        self.ovirt_get_vms(self.url, self.user, self.passw, self.ssl_insecure)
         groups = {}
         # Classify nodes by group into an list
-        logging.info('Groups')
         for vnode in self.vnodes:
             if vnode.values()[0].keys()[0] == 'nodes':
                 group_name = vnode.keys()[0]
@@ -183,15 +181,21 @@ class Ovirt36Inventory(object):
                 else:
                     groups[children_name].append(group_raw)
 
-        logging.info(groups)
-
         # Show inventory on stdout
+        metadata = {'_meta': {'hostvars': {}}}
+        hostvalues = metadata['_meta']['hostvars']
         for group in groups:
-            print '[{}]'.format(group)
-            for nodes in groups[group]:
-                print nodes
+            if group is not None and len(group.split(':')) == 2 and group.split(':')[1] == 'children':
+                parent = group.split(':')[0]
+                metadata[parent] = {'children': []}
+                for node in groups[group]:
+                    metadata[parent]['children'].append(node)
+                continue
+            else:
+                metadata[group] = {'hosts': []}
+            for node in groups[group]:
+                metadata[group]['hosts'].append(node)
+                hostvalues[node] = {'ansible_host': node}
+        return metadata
 
-        logging.info('finished')
-
-if __name__ == "__main__":
-    Ovirt36Inventory()
+Ovirt36Inventory()
