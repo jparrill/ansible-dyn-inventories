@@ -1,0 +1,133 @@
+python dynrhev.py --list | python -m json.tool
+{
+    "_meta": {
+        "hostvars": {
+            "copmute_node_01": {
+                "ansible_host": "copmute_node_01"
+            },
+            "copmute_node_02": {
+                "ansible_host": "copmute_node_02"
+            },
+            "cvs3tci02": {
+                "ansible_host": "cvs3tci02"
+            },
+            "cvs3tha03": {
+                "ansible_host": "cvs3tha03"
+            },
+            "cvs3the02": {
+                "ansible_host": "cvs3the02"
+            },
+            "cvs3the03": {
+                "ansible_host": "cvs3the03"
+            },
+            "cvs3tkf02": {
+                "ansible_host": "cvs3tkf02"
+            },
+            "cvs3tmq01": {
+                "ansible_host": "cvs3tmq01"
+            },
+            "cvs3tmq03": {
+                "ansible_host": "cvs3tmq03"
+            },
+            "cvs3tns02": {
+                "ansible_host": "cvs3tns02"
+            },
+            "cvs3tra01": {
+                "ansible_host": "cvs3tra01"
+            },
+            "cvs3tsk01": {
+                "ansible_host": "cvs3tsk01"
+            },
+            "cvs3tti02": {
+                "ansible_host": "cvs3tti02"
+            },
+            "test_01": {
+                "ansible_host": "test_01"
+            },
+            "test_02": {
+                "ansible_host": "test_02"
+            }
+        }
+    },
+    "cinder-controller": {
+        "hosts": [
+            "cvs3tci02"
+        ]
+    },
+    "heat": {
+        "hosts": [
+            "cvs3the02",
+            "cvs3the03"
+        ]
+    },
+    "internal-haproxy-slave": {
+        "hosts": [
+            "cvs3tha03"
+        ]
+    },
+    "kafka": {
+        "hosts": [
+            "cvs3tkf02"
+        ]
+    },
+    "neutron-agents": {
+        "hosts": [
+            "cvs3tns02"
+        ]
+    },
+    "ntp-servers": {
+        "hosts": [
+            "cvs3tti02"
+        ]
+    },
+    "null": {
+        "hosts": [
+            "copmute_node_01",
+            "copmute_node_02",
+            "test_01",
+            "test_02"
+        ]
+    },
+    "rabbitmq": {
+        "hosts": [
+            "cvs3tmq01",
+            "cvs3tmq03"
+        ]
+    },
+    "rally": {
+        "hosts": [
+            "cvs3tra01"
+        ]
+    },
+    "splunk_indexer": {
+        "hosts": [
+            "cvs3tsk01"
+        ]
+    },
+    "test": {
+        "children": [
+            "ansible",
+            "vars",
+            "ntp"
+        ]
+    },
+    "test2": {
+        "children": [
+            "lol",
+            "onnud",
+            "otp"
+        ]
+    },
+    "test4": {
+        "children": [
+            "ansible2"
+        ]
+    },
+    "test7": {
+        "children": [
+            "ansible",
+            "lol",
+            "3D"
+        ]
+    }
+}

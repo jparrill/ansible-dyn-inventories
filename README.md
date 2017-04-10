@@ -5,4 +5,4 @@ This repository will contain some dynamic inventories that I usually use, maybe 
 
 ## Index
 
-- [oVirt 36](ovirt/README.md)
+- [oVirt](ovirt/README.md)

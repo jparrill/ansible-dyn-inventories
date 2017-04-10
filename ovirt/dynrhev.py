@@ -19,10 +19,10 @@ def empty():
     return {'_meta': {'hostvars': {}}}
 
 
-class Ovirt36Inventory(object):
-    """docstring for Ovirt36Inventory"""
+class OvirtInventory(object):
+    """docstring for OvirtInventory"""
     def __init__(self):
-        super(Ovirt36Inventory, self).__init__()
+        super(OvirtInventory, self).__init__()
         self.get_config()
         self.read_cli_args()
         self.read_cfg_groups()
@@ -198,4 +198,4 @@ class Ovirt36Inventory(object):
                 hostvalues[node] = {'ansible_host': node}
         return metadata
 
-Ovirt36Inventory()
+OvirtInventory()

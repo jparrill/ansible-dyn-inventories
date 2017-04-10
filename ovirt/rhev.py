@@ -15,10 +15,10 @@ import ConfigParser
 import re
 
 
-class Ovirt36Inventory(object):
-    """docstring for Ovirt36Inventory"""
+class OvirtInventory(object):
+    """docstring for OvirtInventory"""
     def __init__(self):
-        super(Ovirt36Inventory, self).__init__()
+        super(OvirtInventory, self).__init__()
         self.get_config()
         self.logger(self.logpath)
         self.read_cfg_groups()
@@ -194,4 +194,4 @@ class Ovirt36Inventory(object):
         logging.info('finished')
 
 if __name__ == "__main__":
-    Ovirt36Inventory()
+    OvirtInventory()
